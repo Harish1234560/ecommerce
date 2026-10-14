@@ -1,0 +1,52 @@
+{
+  "name": "@shophub/backend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "setup:env": "tsx scripts/setup-env.ts",
+    "setup:db": "tsx scripts/setup-db.ts",
+    "dev": "tsx watch --clear-screen=false src/server.ts",
+    "build": "prisma generate && tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json",
+    "db:start": "tsx scripts/dev-db.ts",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force --skip-seed && tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "test": "tsx tests/run.ts",
+    "test:stack": "tsx tests/with-stack.ts",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.0",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "nodemailer": "^10.0.13",
+    "pdfkit": "^0.17.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pdfkit": "^0.17.0",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "prisma": "^6.16.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

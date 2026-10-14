@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Local database (bundled PostgreSQL data directory) and uploaded files
+backend/.pgdata/
+backend/uploads/
+backend/.tmp/
+
+# Test output
+coverage/
+frontend/test-results/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Caches
+.cache/
+.eslintcache
+.vite/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
