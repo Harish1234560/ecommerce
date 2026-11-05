@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: shophub-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build -w backend
+    startCommand: npm start -w backend
+    healthCheckPath: /api/v1/settings/public
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24
