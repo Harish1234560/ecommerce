@@ -49,8 +49,17 @@ export function createApp() {
   // gzip/brotli for JSON, HTML, JS and CSS — the biggest win on slow mobile connections.
   app.use(compression());
 
-  // Only the storefront origin may call the API from a browser.
-  app.use('/api', cors({ origin: env.CLIENT_URL, credentials: true, exposedHeaders: ['Content-Disposition'] }));
+  const allowedOrigins = new Set([
+    env.CLIENT_URL.replace(/\/$/, ''),
+    ...(env.ALLOWED_ORIGINS?.split(',').map((origin) => origin.trim().replace(/\/$/, '')).filter(Boolean) ?? []),
+  ]);
+
+  // Only configured storefront origins may call the API from a browser.
+  app.use('/api', cors({
+    origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin.replace(/\/$/, ''))),
+    credentials: true,
+    exposedHeaders: ['Content-Disposition'],
+  }));
   app.use('/api', apiLimiter, requestLogger);
   // API responses are private by default; public catalogue endpoints opt in to caching themselves.
   app.use('/api', (_req, res, next) => {
