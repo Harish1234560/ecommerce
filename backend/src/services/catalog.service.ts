@@ -232,3 +232,17 @@ export async function recalcRating(db: Tx, productId: string) {
     data: { ratingAvg: Math.round((agg._avg.rating ?? 0) * 10) / 10, ratingCount: agg._count._all },
   });
 }
+
+// Search ideas for an empty search box: the most common tags and brands among the best-selling
+// products. Derived from real catalogue data, so there is nothing to maintain by hand.
+export async function popularSearches(limit = 8): Promise<string[]> {
+  const top = await prisma.product.findMany({ where: visibleProduct, select: { tags: true, brand: true }, orderBy: { salesCount: 'desc' }, take: 40 });
+  const counts = new Map<string, number>();
+  for (const p of top) {
+    for (const term of [...p.tags, ...(p.brand ? [p.brand] : [])]) {
+      const key = term.trim().toLowerCase();
+      if (key.length >= 3) counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([term]) => term);
+}

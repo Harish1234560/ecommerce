@@ -31,7 +31,7 @@ export function AccountLayout() {
                 to={to}
                 className={({ isActive }) =>
                   clsx(
-                    'flex shrink-0 items-center gap-2.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors lg:rounded-xl lg:border-0 lg:px-3 lg:py-2.5',
+                    'flex min-h-[44px] shrink-0 items-center gap-2.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors lg:rounded-xl lg:border-0 lg:px-3 lg:py-2.5',
                     isActive ? 'border-ink bg-ink text-white' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-100 lg:bg-transparent',
                   )
                 }

@@ -60,7 +60,7 @@ export function WishlistPage() {
               <li key={entry.id} className="card flex gap-4 p-3 sm:p-4">
                 <Link to={`/product/${p.slug}`} className="h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-stone-100"><Img src={p.image} alt={p.name} className="h-full w-full object-cover" /></Link>
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <Link to={`/product/${p.slug}`} className="line-clamp-2 text-sm font-medium text-stone-900 hover:text-brand-700">{p.name}</Link>
+                  <Link to={`/product/${p.slug}`} className="line-clamp-2 py-1.5 text-sm font-medium text-stone-900 hover:text-brand-700">{p.name}</Link>
                   <Price price={p.sellingPrice} mrp={p.price} size="sm" className="mt-1" />
                   <p className={`mt-1 text-xs font-semibold ${inStock ? 'text-emerald-700' : 'text-rose-600'}`}>{!entry.available ? 'No longer available' : inStock ? 'In stock' : 'Out of stock'}</p>
                   <div className="mt-auto flex items-center gap-2 pt-2">

@@ -74,6 +74,7 @@ endpoints have a stricter rate limit.
 | GET | `/home` | Public | Everything the home page shows: banners, sections, categories, product rows, testimonials |
 | GET | `/products` | Public | Product list. Query: `q`, `category`, `subcategory`, `brand` (comma-separated), `minPrice`, `maxPrice` (rupees), `rating`, `discount`, `inStock`, `featured`, `trending`, `bestseller`, `sort` (`popularity`, `newest`, `price_asc`, `price_desc`, `rating`, `discount`), `page`, `limit` (max 48). `meta` includes the brands and price range available for the filters |
 | GET | `/products/suggest` | Public | Search suggestions. Query: `q` (2+ characters) |
+| GET | `/search/popular` | Public | Popular search terms, derived from the best-selling products' tags and brands |
 | GET | `/products/:slug` | Public | Product detail with images, variants, stock, related products |
 | GET | `/products/:slug/reviews` | Public | Approved reviews. Query: `page`, `limit`, `rating` |
 | GET | `/categories` | Public | Categories with subcategories |

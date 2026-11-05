@@ -1,20 +1,24 @@
 import type { Request, Response } from 'express';
 import * as catalogService from '../services/catalog.service.js';
 import * as storefrontService from '../services/storefront.service.js';
-import { ok, pageMeta } from '../utils/response.js';
+import { cached } from '../utils/cache.js';
+import { ok, pageMeta, publicCache } from '../utils/response.js';
 import { deliveryCheckSchema, newsletterSchema, productQuerySchema, productReviewsQuerySchema, suggestSchema } from '../validators/catalog.validators.js';
 import { validate } from '../validators/common.js';
 
-// Public, read-mostly storefront endpoints.
+// Public, read-mostly storefront endpoints. None of these responses depend on who is asking, so
+// they may be cached briefly by browsers and the server (see utils/cache.ts).
 
 export async function listProducts(req: Request, res: Response) {
   const query = validate(productQuerySchema, req.query);
   const { items, total, facets } = await catalogService.listProducts(query);
+  publicCache(res, 30);
   ok(res, items, { meta: { ...pageMeta(total, query.page, query.limit), facets } });
 }
 
 export async function suggestProducts(req: Request, res: Response) {
   const { q } = validate(suggestSchema, req.query);
+  publicCache(res, 60);
   ok(res, await catalogService.suggestProducts(q));
 }
 
@@ -29,7 +33,8 @@ export async function listProductReviews(req: Request<{ slug: string }>, res: Re
 }
 
 export async function listCategories(_req: Request, res: Response) {
-  ok(res, await catalogService.listCategories());
+  publicCache(res, 60);
+  ok(res, await cached('categories', catalogService.listCategories));
 }
 
 export async function getCategory(req: Request<{ slug: string }>, res: Response) {
@@ -37,19 +42,29 @@ export async function getCategory(req: Request<{ slug: string }>, res: Response)
 }
 
 export async function home(_req: Request, res: Response) {
-  ok(res, await storefrontService.getHome());
+  publicCache(res, 30);
+  ok(res, await cached('home', storefrontService.getHome));
 }
 
 export async function offers(_req: Request, res: Response) {
-  ok(res, await storefrontService.getOffers());
+  publicCache(res, 30);
+  ok(res, await cached('offers', storefrontService.getOffers));
 }
 
 export async function contentPage(req: Request<{ slug: string }>, res: Response) {
-  ok(res, await storefrontService.getContentPage(req.params.slug));
+  const { slug } = req.params;
+  publicCache(res, 60);
+  ok(res, await cached(`content:${slug}`, () => storefrontService.getContentPage(slug)));
 }
 
 export async function publicSettings(_req: Request, res: Response) {
-  ok(res, await storefrontService.getPublicSettings());
+  publicCache(res, 60);
+  ok(res, await cached('settings', storefrontService.getPublicSettings));
+}
+
+export async function popularSearches(_req: Request, res: Response) {
+  publicCache(res, 300);
+  ok(res, await cached('popular-searches', () => catalogService.popularSearches(), 10 * 60_000));
 }
 
 export async function checkDelivery(req: Request, res: Response) {

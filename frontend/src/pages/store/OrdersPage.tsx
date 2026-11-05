@@ -44,7 +44,7 @@ export function OrdersPage() {
             role="tab"
             aria-selected={status === t.key}
             onClick={() => setParams(t.key ? { status: t.key } : {})}
-            className={clsx('shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors', status === t.key ? 'border-ink bg-ink text-white' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-100')}
+            className={clsx('min-h-[40px] shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors', status === t.key ? 'border-ink bg-ink text-white' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-100')}
           >
             {t.label}
           </button>

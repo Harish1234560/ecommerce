@@ -38,9 +38,15 @@ export default tseslint.config(
     },
   },
 
+  // Service worker and offline page scripts are plain browser scripts.
+  {
+    files: ['frontend/public/**/*.js'],
+    languageOptions: { sourceType: 'script', globals: { ...globals.browser, ...globals.serviceworker } },
+  },
+
   // Code passed to page.evaluate() in the browser tests runs inside the page.
   {
     files: ['frontend/tests/**/*.mjs'],
-    languageOptions: { globals: { ...globals.node, window: 'readonly', document: 'readonly', location: 'readonly', getComputedStyle: 'readonly' } },
+    languageOptions: { globals: { ...globals.node, window: 'readonly', document: 'readonly', location: 'readonly', getComputedStyle: 'readonly', PerformanceObserver: 'readonly' } },
   },
 );

@@ -364,6 +364,18 @@ export async function runApiTests(): Promise<number> {
   check('payments list', (await api('GET', '/api/v1/admin/payments', { token: admin })).body.data.length > 0);
   check('audit log records admin actions', (await api('GET', '/api/v1/admin/settings/audit-logs', { token: admin })).body.data.some((l: Json) => l.action === 'order.status'));
 
+  section('Caching and search ideas');
+  const homeRes = await api('GET', '/api/v1/home');
+  check('public catalogue data is cacheable', /public, max-age=\d+/.test(homeRes.headers.get('cache-control') ?? ''), homeRes.headers.get('cache-control'));
+  check('personal data is never cached', (await api('GET', '/api/v1/cart', { token })).headers.get('cache-control') === 'no-store');
+  const bannerTitle = `Cache test ${stamp}`;
+  const banner = await api('POST', '/api/v1/admin/content/banners', { token: admin, body: { type: 'HERO', title: bannerTitle, imageUrl: 'https://images.pexels.com/photos/5632399/pexels-photo-5632399.jpeg', isActive: true, sortOrder: 99 } });
+  check('an admin change shows on the cached home page at once', banner.status === 201 && (await api('GET', '/api/v1/home')).body.data.banners.hero.some((b: Json) => b.title === bannerTitle), banner.body);
+  await api('DELETE', `/api/v1/admin/content/banners/${banner.body.data?.id}`, { token: admin });
+  check('deleted banner disappears from the home page', !(await api('GET', '/api/v1/home')).body.data.banners.hero.some((b: Json) => b.title === bannerTitle));
+  const popular = await api('GET', '/api/v1/search/popular');
+  check('popular searches come from the catalogue', popular.status === 200 && Array.isArray(popular.body.data) && popular.body.data.length > 0 && popular.body.data.every((t: Json) => typeof t === 'string'), popular.body);
+
   section('Announcements');
   const notice = { title: `Flash sale ${stamp}`, message: 'Extra 10% off everything this weekend.', link: '/offers' };
   check('customer cannot send announcements', (await api('POST', '/api/v1/admin/notifications/broadcast', { token, body: notice })).status === 403);

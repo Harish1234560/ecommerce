@@ -43,6 +43,9 @@ are all part of this repository.
 - Payments verified on the server by gateway signature and amount, with idempotent webhooks
 - Short-lived JWT access tokens plus revocable refresh sessions in an httpOnly cookie; role-based access control
 - Request validation, rate limiting, security headers, upload validation and centralised error handling
+- Mobile-first interface with bottom navigation, bottom sheets and pinned purchase bars
+- Page metadata and structured data rendered by the server for every public URL
+- Installable as an app (web manifest, service worker, offline page); no customer data is cached
 
 ## Tech Stack
 
@@ -111,7 +114,7 @@ project/
 │   ├── scripts/              environment and database setup
 │   ├── tests/                API tests and the shared test stack
 │   └── uploads/              locally stored images (git-ignored)
-├── docs/                     architecture, database, API, development, deployment
+├── docs/                     architecture, database, API, development, deployment, design system
 ├── eslint.config.mjs
 ├── package.json              workspace scripts
 └── README.md
@@ -183,12 +186,15 @@ npm run lint          # ESLint for the whole workspace
 npm run typecheck     # TypeScript for backend and frontend
 npm test              # API tests (149 checks) against an isolated test database
 npm run test:e2e      # builds the frontend, then runs the browser journey (41 steps)
-npm run test:responsive   # every page at 9 viewport widths, 360px to 1920px
+npm run test:responsive   # every page at 10 viewport widths, 360px to 1920px
+npm run test:seo          # titles, canonicals, structured data, robots, sitemap, caching, PWA (49 checks)
+npm run test:vitals       # LCP and CLS on an emulated phone with a throttled network and CPU
 ```
 
 The tests start and stop their own database and API and never touch development data.
 The browser tests use an installed Microsoft Edge (Windows) or Google Chrome.
-More detail: [docs/development.md](docs/development.md).
+More detail: [docs/development.md](docs/development.md). Design tokens and components:
+[docs/design-system.md](docs/design-system.md).
 
 ## Production Build
 
@@ -232,9 +238,8 @@ Step-by-step instructions and the go-live checklist: [docs/deployment.md](docs/d
 - Phone / OTP login and Google login are not included; sign-in is by email and password.
 - SMS, WhatsApp and push notifications are not connected; notifications are in-app and email.
 - Image storage supports local disk and Cloudinary. S3 is not implemented.
-- The storefront is a client-rendered SPA. Page titles, descriptions, canonical URLs, Open Graph tags
-  and product structured data are set in the browser, so crawlers that do not run JavaScript will
-  not see them.
+- The storefront is a single-page app. The server fills in each page's title, description,
+  canonical URL, Open Graph tags and structured data, so crawlers and link previews get correct
+  metadata without running JavaScript; the page body itself is still rendered in the browser.
+- Images uploaded to local storage are not resized. Use Cloudinary storage for right-sized images.
 - Demo product images are hot-linked from Pexels; replace them with your own uploads.
-#   e c o m m e r c e  
- 

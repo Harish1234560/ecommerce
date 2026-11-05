@@ -1,7 +1,7 @@
 import { errorMessage } from '@/api/client';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { SectionHeading } from '@/components/common/SectionHeading';
-import { ProductGrid } from '@/components/product/ProductGrid';
+import { ProductRail } from '@/components/product/ProductGrid';
 import { clsx } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { Badge, ErrorState, Skeleton } from '@/components/ui/Feedback';
@@ -9,7 +9,7 @@ import { Price } from '@/components/ui/Price';
 import { QuantityStepper } from '@/components/ui/QuantityStepper';
 import { Stars } from '@/components/ui/Rating';
 import { useCart } from '@/hooks/useCart';
-import { useSeo } from '@/hooks/useSeo';
+import { breadcrumbLd, useSeo } from '@/hooks/useSeo';
 import { useSettings } from '@/hooks/useSettings';
 import { useWishlist } from '@/hooks/useWishlist';
 import { DeliveryCheck } from '@/sections/product/DeliveryCheck';
@@ -17,6 +17,7 @@ import { Gallery } from '@/sections/product/Gallery';
 import { ProductReviews } from '@/sections/product/ProductReviews';
 import { catalogService } from '@/services/catalogService';
 import { toast } from '@/store/toast';
+import { money } from '@/utils/format';
 import { useQuery } from '@tanstack/react-query';
 import { Heart, RefreshCw, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -24,8 +25,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function DetailSkeleton() {
   return (
-    <div className="container-page grid gap-8 py-8 lg:grid-cols-2">
-      <Skeleton className="aspect-square w-full rounded-3xl" />
+    <div className="container-page grid gap-5 pb-8 sm:gap-8 sm:py-8 lg:grid-cols-2">
+      <Skeleton className="-mx-4 aspect-square w-auto rounded-none sm:mx-0 sm:w-full sm:rounded-3xl" />
       <div className="space-y-4">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-9 w-3/4" />
@@ -75,8 +76,9 @@ export default function ProductDetailPage() {
     title: product?.name,
     description: product?.description.slice(0, 160),
     image: product?.images[0]?.url,
+    type: 'product',
     jsonLd: product
-      ? {
+      ? [{
           '@context': 'https://schema.org',
           '@type': 'Product',
           name: product.name,
@@ -89,10 +91,11 @@ export default function ProductDetailPage() {
             '@type': 'Offer',
             priceCurrency: 'INR',
             price: (product.sellingPrice / 100).toFixed(2),
-            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            url: window.location.href,
+            availability: product.available > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: window.location.origin + window.location.pathname,
+            itemCondition: 'https://schema.org/NewCondition',
           },
-        }
+        }, breadcrumbLd([{ name: 'Home', path: '/' }, { name: product.category.name, path: `/category/${product.category.slug}` }, { name: product.name, path: `/product/${product.slug}` }])]
       : null,
   });
 
@@ -127,25 +130,27 @@ export default function ProductDetailPage() {
 
   const chip = (selected: boolean, enabled: boolean) =>
     clsx(
-      'relative min-w-[3rem] rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors',
+      'pressable relative min-h-[44px] min-w-[3rem] rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors',
       selected ? 'border-ink bg-ink text-white' : enabled ? 'border-stone-300 bg-white text-stone-800 hover:border-stone-500' : 'border-stone-200 bg-stone-50 text-stone-400 line-through',
     );
 
   return (
-    <div className="container-page space-y-14 py-5 lg:py-8">
+    <div className="container-page space-y-10 pb-28 pt-0 sm:space-y-14 sm:pb-8 sm:pt-5 lg:py-8">
       <div>
-        <Breadcrumbs items={[{ label: product.category.name, to: `/category/${product.category.slug}` }, { label: product.name }]} />
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          <div className="lg:sticky lg:top-44 lg:self-start">
+        <div className="hidden sm:block">
+          <Breadcrumbs items={[{ label: product.category.name, to: `/category/${product.category.slug}` }, { label: product.name }]} />
+        </div>
+        <div className="grid gap-5 sm:gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="lg:sticky lg:top-36 lg:self-start">
             <Gallery images={product.images} name={product.name} />
           </div>
 
           <div>
             {product.brand && <p className="text-xs font-bold uppercase tracking-widest text-brand-700">{product.brand}</p>}
-            <h1 className="mt-1 text-2xl font-bold leading-tight text-stone-900 sm:text-3xl">{product.name}</h1>
+            <h1 className="mt-1 text-h1 text-stone-900 sm:text-3xl sm:leading-tight">{product.name}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {product.ratingCount > 0 ? (
-                <a href="#reviews" className="flex items-center gap-2 text-sm text-stone-600 hover:text-stone-900">
+                <a href="#reviews" className="-my-2 flex min-h-[44px] items-center gap-2 text-sm text-stone-600 hover:text-stone-900">
                   <Stars value={product.ratingAvg} size="md" />
                   <span className="font-semibold text-stone-800">{product.ratingAvg.toFixed(1)}</span>
                   <span className="underline underline-offset-2">{product.ratingCount} review{product.ratingCount === 1 ? '' : 's'}</span>
@@ -200,14 +205,14 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" className="flex-1" disabled={!canBuy} loading={add.isPending && !buying} onClick={() => void addToCart(false)} icon={<ShoppingBag className="h-5 w-5" />}>
+              <Button size="lg" className="hidden flex-1 sm:inline-flex" disabled={!canBuy} loading={add.isPending && !buying} onClick={() => void addToCart(false)} icon={<ShoppingBag className="h-5 w-5" />}>
                 {available <= 0 && !needsChoice ? 'Out of stock' : 'Add to Cart'}
               </Button>
-              <Button size="lg" variant="brand" className="flex-1" disabled={!canBuy} loading={buying} onClick={() => void addToCart(true)} icon={<Zap className="h-5 w-5" />}>
+              <Button size="lg" variant="brand" className="hidden flex-1 sm:inline-flex" disabled={!canBuy} loading={buying} onClick={() => void addToCart(true)} icon={<Zap className="h-5 w-5" />}>
                 Buy Now
               </Button>
               <Button size="lg" variant="outline" className="sm:w-14 sm:px-0" onClick={() => wishlist.toggle(product.id)} aria-pressed={wished} aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}>
-                <Heart className={clsx('h-5 w-5', wished && 'fill-rose-500 text-rose-500')} />
+                <Heart key={String(wished)} className={clsx('h-5 w-5', wished && 'animate-pop fill-rose-500 text-rose-500')} />
                 <span className="sm:hidden">{wished ? 'Saved to wishlist' : 'Add to wishlist'}</span>
               </Button>
             </div>
@@ -238,7 +243,7 @@ export default function ProductDetailPage() {
       <section>
         <div className="flex gap-6 border-b border-stone-200" role="tablist">
           {(['description', 'specs'] as const).map((t) => (
-            <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={clsx('-mb-px border-b-2 pb-3 text-sm font-semibold transition-colors', tab === t ? 'border-ink text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800')}>
+            <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={clsx('-mb-px min-h-[44px] border-b-2 pb-2.5 pt-2 text-sm font-semibold transition-colors', tab === t ? 'border-ink text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800')}>
               {t === 'description' ? 'Description' : 'Specifications'}
             </button>
           ))}
@@ -250,7 +255,7 @@ export default function ProductDetailPage() {
               {product.tags.length > 0 && (
                 <p className="flex flex-wrap gap-2 pt-2">
                   {product.tags.map((t) => (
-                    <Link key={t} to={`/search?q=${encodeURIComponent(t)}`} className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 hover:bg-stone-200">#{t}</Link>
+                    <Link key={t} to={`/search?q=${encodeURIComponent(t)}`} className="inline-flex min-h-[36px] items-center rounded-full bg-stone-100 px-3 text-xs font-medium text-stone-600 hover:bg-stone-200">#{t}</Link>
                   ))}
                 </p>
               )}
@@ -268,10 +273,26 @@ export default function ProductDetailPage() {
         </div>
       </section>
 
+      {/* Phones: price and the two purchase actions stay within thumb reach while the page scrolls. */}
+      <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-stone-200 bg-white/95 px-4 pb-[calc(0.625rem+var(--safe-bottom))] pt-2.5 shadow-bar backdrop-blur sm:hidden">
+        <div className="flex items-center gap-2.5">
+          <div className="min-w-0 shrink-0 pr-1">
+            <p className="text-lg font-bold leading-tight text-stone-900">{money(price)}</p>
+            {mrp > price ? <p className="text-xs font-semibold text-emerald-700">{Math.round(((mrp - price) / mrp) * 100)}% off</p> : <p className="text-xs text-stone-500">Incl. taxes</p>}
+          </div>
+          <Button className="flex-1 px-2" variant="outline" disabled={!canBuy} loading={add.isPending && !buying} onClick={() => void addToCart(false)}>
+            {available <= 0 && !needsChoice ? 'Out of stock' : 'Add to Cart'}
+          </Button>
+          <Button className="flex-1 px-2" variant="brand" disabled={!canBuy} loading={buying} onClick={() => void addToCart(true)}>
+            Buy Now
+          </Button>
+        </div>
+      </div>
+
       {product.frequentlyBought.length > 0 && (
         <section>
           <SectionHeading title="Frequently bought together" subtitle="Customers who bought this also bought" />
-          <ProductGrid products={product.frequentlyBought} />
+          <ProductRail products={product.frequentlyBought} />
         </section>
       )}
 
@@ -280,7 +301,7 @@ export default function ProductDetailPage() {
       {product.related.length > 0 && (
         <section>
           <SectionHeading title="Related products" to={`/category/${product.category.slug}`} />
-          <ProductGrid products={product.related.slice(0, 5)} />
+          <ProductRail products={product.related.slice(0, 5)} />
         </section>
       )}
     </div>

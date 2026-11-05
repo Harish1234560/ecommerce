@@ -42,7 +42,9 @@ Run from the repository root.
 | `npm run typecheck` | TypeScript for backend (source, tests, scripts, seed) and frontend |
 | `npm test` | API tests |
 | `npm run test:e2e` | Build the frontend and run the browser journey |
-| `npm run test:responsive` | Build the frontend and check every page at nine viewport widths |
+| `npm run test:responsive` | Build the frontend and check every page at ten viewport widths |
+| `npm run test:seo` | Build the frontend and check metadata, robots, sitemap, caching and PWA files |
+| `npm run test:vitals` | Build the frontend and measure LCP and CLS on an emulated phone |
 | `npm run db:start` | Start the bundled PostgreSQL on its own |
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:seed` | Seed demo data (skipped when data exists) |
@@ -73,8 +75,19 @@ refund approval, support ticket, profile edit, sign-out and sign-in, and guest-c
 on any console error, page error or 5xx response.
 
 **Responsive check** (`frontend/tests/e2e/responsive.mjs`) loads every page as a guest, a customer
-and the admin at 360, 375, 390, 412, 768, 1024, 1280, 1440 and 1920 pixels and fails on horizontal
+and the admin at 360, 375, 390, 412, 430, 768, 1024, 1280, 1440 and 1920 pixels and fails on horizontal
 overflow, console errors, failed requests or unexpected redirects.
+
+**SEO check** (`frontend/tests/e2e/seo.mjs`, 49 checks) reads the raw server responses, as a
+crawler would: unique titles and descriptions, canonical URLs, Open Graph and Twitter tags,
+Product / Breadcrumb / Organization / WebSite structured data, `noindex` on private pages, real 404
+status codes, `robots.txt`, `sitemap.xml`, compression and cache headers, and the PWA files.
+
+**Vitals check** (`frontend/tests/e2e/vitals.mjs`) loads the home, listing, product and category
+pages on an emulated 390×844 phone with a throttled network (`E2E_NETWORK=fast4g` by default, or
+`slow4g`) and a 4× CPU slowdown, and fails if Largest Contentful Paint or Cumulative Layout Shift
+miss the targets (LCP under 2.5s on fast 4G, CLS under 0.1). Product images in the demo data come
+from an external host, so the numbers vary a little between runs.
 
 ```bash
 npm run test:responsive -w frontend -- 360 768        # only these widths (uses the existing build)

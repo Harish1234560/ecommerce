@@ -1,0 +1,138 @@
+/*
+ * ShopHub design tokens — the single place to rebrand the storefront.
+ *
+ * Colours are RGB channel triplets so Tailwind opacity modifiers work (bg-brand-600/20).
+ * tailwind.config.js maps every palette (brand, accent, stone, rose, amber, emerald, sky) and the
+ * semantic aliases (surface, fg, line, …) to these variables; components never hardcode hex values.
+ */
+:root {
+  /* Brand — deep peacock green: calm, premium, trustworthy. */
+  --brand-50: 237 250 245;
+  --brand-100: 211 243 230;
+  --brand-200: 167 230 205;
+  --brand-300: 110 210 172;
+  --brand-400: 54 182 137;
+  --brand-500: 21 151 110;
+  --brand-600: 11 122 90;
+  --brand-700: 10 98 74;
+  --brand-800: 11 78 61;
+  --brand-900: 10 64 51;
+  --brand-950: 4 37 30;
+
+  /* Accent — saffron, for deals, discounts and highlights. */
+  --accent-50: 255 247 235;
+  --accent-100: 254 235 200;
+  --accent-200: 253 213 145;
+  --accent-300: 252 186 82;
+  --accent-400: 250 160 35;
+  --accent-500: 236 132 12;
+  --accent-600: 205 102 6;
+  --accent-700: 170 76 9;
+  --accent-800: 138 60 14;
+  --accent-900: 113 50 15;
+
+  /* Neutrals — warm stone. */
+  --stone-50: 250 249 247;
+  --stone-100: 244 242 239;
+  --stone-200: 231 228 223;
+  --stone-300: 214 210 204;
+  --stone-400: 168 162 154;
+  --stone-500: 120 114 107;
+  --stone-600: 87 82 77;
+  --stone-700: 68 64 60;
+  --stone-800: 41 37 36;
+  --stone-900: 28 25 23;
+  --stone-950: 12 10 9;
+
+  /* Status: error, warning, success, info. */
+  --error-50: 255 241 242;
+  --error-100: 255 228 230;
+  --error-200: 254 205 211;
+  --error-300: 253 164 175;
+  --error-400: 251 113 133;
+  --error-500: 244 63 94;
+  --error-600: 225 29 72;
+  --error-700: 190 18 60;
+  --error-800: 159 18 57;
+  --error-900: 136 19 55;
+  --warning-50: 255 251 235;
+  --warning-100: 254 243 199;
+  --warning-200: 253 230 138;
+  --warning-300: 252 211 77;
+  --warning-400: 251 191 36;
+  --warning-500: 245 158 11;
+  --warning-600: 217 119 6;
+  --warning-700: 180 83 9;
+  --warning-800: 146 64 14;
+  --warning-900: 120 53 15;
+  --success-50: 236 253 245;
+  --success-100: 209 250 229;
+  --success-200: 167 243 208;
+  --success-300: 110 231 183;
+  --success-400: 52 211 153;
+  --success-500: 16 185 129;
+  --success-600: 5 150 105;
+  --success-700: 4 120 87;
+  --success-800: 6 95 70;
+  --success-900: 6 78 59;
+  --info-50: 240 249 255;
+  --info-100: 224 242 254;
+  --info-200: 186 230 253;
+  --info-300: 125 211 252;
+  --info-400: 56 189 248;
+  --info-500: 14 165 233;
+  --info-600: 2 132 199;
+  --info-700: 3 105 161;
+  --info-800: 7 89 133;
+  --info-900: 12 74 110;
+
+  /* Semantic aliases. */
+  --color-bg: var(--stone-50);
+  --color-surface: 255 255 255;
+  --color-surface-elevated: 255 255 255;
+  --color-surface-muted: var(--stone-100);
+  --color-fg: var(--stone-900);
+  --color-fg-secondary: var(--stone-600);
+  --color-fg-muted: var(--stone-500);
+  --color-line: var(--stone-200);
+  --color-ink: var(--stone-900);
+  --color-primary: var(--stone-900);
+  --color-primary-hover: var(--stone-800);
+  --color-primary-soft: var(--stone-100);
+
+  /* Radius. */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Elevation — soft, low-contrast shadows. */
+  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 4px 16px rgb(28 25 23 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(28 25 23 / 0.04), 0 12px 32px rgb(28 25 23 / 0.1);
+  --shadow-bar: 0 -4px 16px rgb(28 25 23 / 0.06);
+
+  /* Motion. */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layers. */
+  --z-sticky: 30;
+  --z-header: 40;
+  --z-nav: 45;
+  --z-overlay: 90;
+  --z-toast: 100;
+
+  /* Layout. */
+  --header-height: 7.5rem; /* mobile header incl. search row */
+  --bottom-nav-height: 3.75rem;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 6rem;
+  }
+}

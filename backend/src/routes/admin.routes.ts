@@ -3,10 +3,19 @@ import * as catalog from '../controllers/admin/catalog.admin.controller.js';
 import * as content from '../controllers/admin/content.admin.controller.js';
 import * as sales from '../controllers/admin/sales.admin.controller.js';
 import { requireAdmin } from '../middleware/auth.js';
+import { invalidatePublicCache } from '../utils/cache.js';
 
 // Everything under /admin requires an authenticated ADMIN.
 const router = Router();
 router.use(requireAdmin);
+router.use((req, res, next) => {
+  if (req.method !== 'GET') {
+    res.on('finish', () => {
+      if (res.statusCode < 400) invalidatePublicCache();
+    });
+  }
+  next();
+});
 
 // Overview
 router.get('/dashboard', sales.dashboard);

@@ -85,7 +85,7 @@ export function ContactPage() {
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"><Icon className="h-5 w-5" /></span>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">{label}</p>
-                  {href ? <a href={href} className="mt-0.5 block break-words text-sm font-medium text-stone-900 hover:text-brand-700">{value}</a> : <p className="mt-0.5 text-sm font-medium leading-6 text-stone-900">{value}</p>}
+                  {href ? <a href={href} className="-my-1 flex min-h-[40px] items-center break-words text-sm font-medium text-stone-900 hover:text-brand-700">{value}</a> : <p className="mt-0.5 text-sm font-medium leading-6 text-stone-900">{value}</p>}
                 </div>
               </li>
             ))}
@@ -93,7 +93,7 @@ export function ContactPage() {
               <li className="flex items-center gap-3 p-5">
                 <span className="text-xs font-semibold uppercase tracking-wide text-stone-500">Follow us</span>
                 {social.map(([name, url]) => (
-                  <a key={name} href={url} target="_blank" rel="noopener noreferrer" aria-label={name} className="flex h-9 w-9 items-center justify-center rounded-full bg-stone-100 text-stone-700 transition-colors hover:bg-ink hover:text-white"><SocialIcon name={name} className="h-4 w-4" /></a>
+                  <a key={name} href={url} target="_blank" rel="noopener noreferrer" aria-label={name} className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-700 transition-colors hover:bg-ink hover:text-white"><SocialIcon name={name} className="h-4 w-4" /></a>
                 ))}
               </li>
             )}

@@ -11,7 +11,7 @@ import { useCategories } from '@/hooks/useSettings';
 import { Filters } from '@/sections/listing/Filters';
 import { catalogService } from '@/services/catalogService';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { LayoutGrid, List, PackageSearch, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowUpDown, Check, LayoutGrid, List, PackageSearch, SlidersHorizontal, X } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -41,6 +41,7 @@ interface ListingProps {
 export function Listing({ title, description, banner, crumbs, fixed = {}, lockedCategory, emptyIcon, emptyTitle, heading }: ListingProps) {
   const [params, setParams] = useSearchParams();
   const [sheet, setSheet] = useState(false);
+  const [sortSheet, setSortSheet] = useState(false);
   const [view, setView] = useState<'grid' | 'list'>(() => (localStorage.getItem('listing-view') === 'list' ? 'list' : 'grid'));
   const { data: categories } = useCategories();
 
@@ -87,12 +88,12 @@ export function Listing({ title, description, banner, crumbs, fixed = {}, locked
   const filters = <Filters params={params} set={set} facets={data?.meta.facets} categories={categories} lockedCategory={lockedCategory} />;
 
   return (
-    <div className="container-page py-5 lg:py-8">
+    <div className="container-page py-4 lg:py-8">
       <Breadcrumbs items={crumbs} />
 
       {banner && (
         <div className="relative mb-6 h-36 overflow-hidden rounded-3xl bg-stone-900 sm:h-48">
-          <Img src={banner} alt="" eager className="h-full w-full object-cover opacity-60" />
+          <Img src={banner} alt="" eager preset="banner" className="h-full w-full object-cover opacity-60" />
           <div className="absolute inset-0 flex flex-col justify-center bg-gradient-to-r from-stone-950/70 to-transparent px-6 sm:px-10">
             <h1 className="text-3xl font-extrabold text-white sm:text-4xl">{title}</h1>
             {description && <p className="mt-1.5 max-w-lg text-sm text-stone-200 sm:text-base">{description}</p>}
@@ -102,17 +103,26 @@ export function Listing({ title, description, banner, crumbs, fixed = {}, locked
 
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          {!banner && <h1 className="text-2xl font-bold text-stone-900 sm:text-3xl">{heading ? heading(total) : title}</h1>}
+          {!banner && <h1 className="text-h1 text-stone-900 sm:text-3xl">{heading ? heading(total) : title}</h1>}
           <p className={clsx('text-sm text-stone-500', !banner && 'mt-1')} aria-live="polite">
             {isLoading ? 'Loading products…' : `${total} product${total === 1 ? '' : 's'}${!banner && description ? ` · ${description}` : ''}`}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Phones: two large buttons that open bottom sheets. */}
+        <div className="grid w-full grid-cols-2 gap-2.5 sm:hidden">
+          <Button variant="outline" className="relative" onClick={() => setSheet(true)} icon={<SlidersHorizontal className="h-4 w-4" />}>
+            Filter{active.length > 0 && <span className="ml-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">{active.length}</span>}
+          </Button>
+          <Button variant="outline" onClick={() => setSortSheet(true)} icon={<ArrowUpDown className="h-4 w-4" />}>
+            <span className="truncate">{sort === 'popularity' ? 'Sort' : SORTS.find((s) => s.value === sort)?.label}</span>
+          </Button>
+        </div>
+        <div className="hidden items-center gap-2 sm:flex">
           <Button variant="outline" size="sm" className="lg:hidden" onClick={() => setSheet(true)} icon={<SlidersHorizontal className="h-4 w-4" />}>
             Filters{active.length > 0 && ` (${active.length})`}
           </Button>
           <label className="sr-only" htmlFor="sort">Sort by</label>
-          <select id="sort" value={sort} onChange={(e) => set({ sort: e.target.value === 'popularity' ? null : e.target.value })} className="field h-9 w-auto !rounded-lg !py-0 pr-8 text-sm">
+          <select id="sort" value={sort} onChange={(e) => set({ sort: e.target.value === 'popularity' ? null : e.target.value })} className="field h-9 min-h-0 w-auto !rounded-lg !py-0 pr-8 text-sm">
             {SORTS.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
@@ -139,24 +149,25 @@ export function Listing({ title, description, banner, crumbs, fixed = {}, locked
       {active.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           {active.map((k) => (
-            <button key={k} onClick={() => set({ [k]: null })} className="inline-flex items-center gap-1.5 rounded-full bg-stone-200/70 py-1 pl-3 pr-2 text-xs font-medium text-stone-800 hover:bg-stone-200" aria-label={`Remove filter ${chipLabel(k)}`}>
+            <button key={k} onClick={() => set({ [k]: null })} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-stone-200/70 py-1 pl-3 pr-2 text-xs font-medium text-stone-800 hover:bg-stone-200" aria-label={`Remove filter ${chipLabel(k)}`} data-chip>
               {chipLabel(k)} <X className="h-3.5 w-3.5" />
             </button>
           ))}
-          <button onClick={clearAll} className="text-xs font-semibold text-brand-700 hover:underline">Clear all</button>
+          <button onClick={clearAll} className="min-h-[36px] px-1 text-xs font-semibold text-brand-700 hover:underline">Clear all</button>
         </div>
       )}
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
         <aside className="hidden lg:block" aria-label="Filters">
-          <div className="card sticky top-40 max-h-[calc(100vh-11rem)] overflow-y-auto p-5">{filters}</div>
+          <div className="card sticky top-32 max-h-[calc(100vh-9rem)] overflow-y-auto p-5">{filters}</div>
         </aside>
 
         <div className={clsx('min-w-0 transition-opacity', isFetching && !isLoading && 'opacity-60')}>
+          <h2 className="sr-only">Products</h2>
           {error ? (
             <ErrorState error={error} onRetry={() => void refetch()} />
           ) : isLoading ? (
-            <ProductGrid loading count={8} className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4" />
+            <ProductGrid loading count={8} className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4" />
           ) : total === 0 ? (
             <EmptyState
               icon={emptyIcon ?? <PackageSearch />}
@@ -167,7 +178,7 @@ export function Listing({ title, description, banner, crumbs, fixed = {}, locked
           ) : (
             <>
               {view === 'grid' ? (
-                <ProductGrid products={data!.data} className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4" />
+                <ProductGrid products={data!.data} className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4" />
               ) : (
                 <div className="space-y-3">
                   {data!.data.map((p) => (
@@ -190,8 +201,27 @@ export function Listing({ title, description, banner, crumbs, fixed = {}, locked
         </div>
       </div>
 
-      <Modal open={sheet} onClose={() => setSheet(false)} title="Filters" footer={<><Button variant="outline" size="sm" onClick={clearAll}>Clear all</Button><Button size="sm" onClick={() => setSheet(false)}>Show {total} result{total === 1 ? '' : 's'}</Button></>}>
+      <Modal open={sheet} onClose={() => setSheet(false)} title="Filter" footer={<><Button variant="outline" size="sm" onClick={clearAll} disabled={active.length === 0}>Clear all</Button><Button size="sm" variant="brand" onClick={() => setSheet(false)}>Show {total} result{total === 1 ? '' : 's'}</Button></>}>
         {filters}
+      </Modal>
+      <Modal open={sortSheet} onClose={() => setSortSheet(false)} title="Sort by" size="sm">
+        <div role="radiogroup" aria-label="Sort by" className="-mx-2">
+          {SORTS.map((s) => (
+            <button
+              key={s.value}
+              role="radio"
+              aria-checked={sort === s.value}
+              onClick={() => {
+                set({ sort: s.value === 'popularity' ? null : s.value });
+                setSortSheet(false);
+              }}
+              className={clsx('flex min-h-[48px] w-full items-center justify-between rounded-xl px-3 text-left text-[15px]', sort === s.value ? 'bg-brand-50 font-semibold text-brand-800' : 'text-stone-700 active:bg-stone-100')}
+            >
+              {s.label}
+              {sort === s.value && <Check className="h-4 w-4" aria-hidden />}
+            </button>
+          ))}
+        </div>
       </Modal>
     </div>
   );

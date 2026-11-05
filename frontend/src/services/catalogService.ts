@@ -5,7 +5,8 @@ import type { Category, ContentPage, DeliveryEstimate, HomeData, OffersData, Pro
 export const catalogService = {
   home: () => api.get<HomeData>('/home'),
   products: (query: Params, signal?: AbortSignal) => api.getPaged<ProductCard[], ProductListMeta>('/products', query, signal),
-  suggest: (q: string, signal?: AbortSignal) => api.get<ProductCard[]>('/products/suggest', { q }, signal),
+  popularSearches: () => api.get<string[]>('/search/popular'),
+  suggest:(q: string, signal?: AbortSignal) => api.get<ProductCard[]>('/products/suggest', { q }, signal),
   product: (slug: string) => api.get<ProductDetail>(`/products/${slug}`),
   productReviews: (slug: string, query: { page: number; limit: number; rating?: number | null }) => api.getPaged<ReviewItem[], PageMeta>(`/products/${slug}/reviews`, query),
   categories: () => api.get<Category[]>('/categories'),

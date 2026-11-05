@@ -6,11 +6,22 @@ import { visibleProduct } from '../services/catalog.service.js';
 // robots.txt and a sitemap generated from the live catalogue.
 const router = Router();
 const base = env.CLIENT_URL.replace(/\/$/, '');
+const PRIVATE_PATHS = ['/admin', '/account', '/checkout', '/cart', '/wishlist', '/order/', '/search', '/login', '/register', '/forgot-password', '/reset-password', '/api/'];
 const STATIC_PATHS = ['/', '/products', '/offers', '/about', '/contact', '/return-policy', '/shipping-policy', '/privacy', '/terms'];
 
 router.get('/robots.txt', (_req, res) => {
   res.type('text/plain').send(
-    ['User-agent: *', 'Allow: /', 'Disallow: /admin', 'Disallow: /account', 'Disallow: /checkout', 'Disallow: /cart', 'Disallow: /api/', '', `Sitemap: ${base}/sitemap.xml`, ''].join('\n'),
+    [
+      'User-agent: *',
+      'Allow: /',
+      ...PRIVATE_PATHS.map((p) => `Disallow: ${p}`),
+      // Sorted and paginated listings are duplicates of the plain listing.
+      'Disallow: /*?*sort=',
+      'Disallow: /*?*page=',
+      '',
+      `Sitemap: ${base}/sitemap.xml`,
+      '',
+    ].join('\n'),
   );
 });
 

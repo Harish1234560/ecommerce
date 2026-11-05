@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export function Breadcrumbs({ items }: { items: { label: string; to?: string }[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-sm text-stone-500">
+    <nav aria-label="Breadcrumb" className="mb-3 flex flex-wrap items-center gap-1 text-[13px] text-stone-500 [&_a]:py-2.5 sm:mb-4 sm:text-sm">
       <Link to="/" className="hover:text-stone-900">
         Home
       </Link>

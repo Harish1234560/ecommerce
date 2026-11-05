@@ -87,6 +87,25 @@ whole API and stricter ones on credential endpoints, Zod validation on every inp
 detected from file bytes with a size limit, parameterised queries throughout, secrets only in
 environment variables.
 
+### Caching and delivery
+
+- Responses are compressed (gzip or brotli).
+- Public catalogue data that is the same for everyone (home page, categories, offers, content
+  pages, public settings) is cached in memory for up to a minute (`utils/cache.ts`) and sent with
+  a short `Cache-Control: public` header. Any successful admin change clears the cache.
+- Everything else under `/api` is `no-store`: carts, orders, accounts and anything personal are
+  never cached.
+- Hashed build files are cached for a year; HTML and the service worker are always revalidated.
+
+### Page metadata
+
+The app is a single-page app, so the server fills the `<head>` of `index.html` for the requested
+URL before sending it (`services/seo.service.ts`): title, description, canonical URL, Open Graph
+and Twitter tags, and Schema.org data (Organization and WebSite on the home page; Product with
+Offer, rating and reviews when they exist; BreadcrumbList). Private pages get `noindex`. Unknown
+URLs and unknown products answer with status 404. The page's main image is preloaded. In the
+browser, `hooks/useSeo.ts` keeps the same tags current during navigation.
+
 ### Background jobs
 
 `services/jobs.service.ts` runs in-process timers: every minute it cancels unpaid online orders
@@ -115,6 +134,10 @@ A guest's cart is stored in the browser and priced by `POST /cart/quote`; signin
 into the account cart. Each page sets its title, description, canonical URL and Open Graph tags
 through `useSeo`; product pages add Product structured data. The API serves `/sitemap.xml` and
 `/robots.txt`.
+
+The interface is mobile-first: see [design-system.md](design-system.md) for tokens, components,
+touch rules and motion. A service worker (`public/sw.js`) makes the shop installable and shows an
+offline page when there is no connection; it caches only static build files, never API responses.
 
 The admin dashboard shares the component library but uses its own colour palette (the `.admin`
 class) and is loaded only when an admin route is visited.

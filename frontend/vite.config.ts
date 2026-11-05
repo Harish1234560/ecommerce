@@ -16,6 +16,8 @@ export default defineConfig(({ mode }) => {
       proxy: { '/api': proxied, '/uploads': proxied, '/sitemap.xml': proxied, '/robots.txt': proxied },
     },
     build: {
+      // Never inline assets as data: URIs — the content security policy only allows same-origin fonts.
+      assetsInlineLimit: 0,
       rollupOptions: {
         output: {
           manualChunks: {

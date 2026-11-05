@@ -93,8 +93,8 @@ export function Select({ label, error, hint, wrapperClassName, className, id, re
 
 export function Checkbox({ label, className, ...rest }: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode }) {
   return (
-    <label className={clsx('flex cursor-pointer items-start gap-2.5 text-sm text-stone-700', className)}>
-      <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 text-brand-600 accent-brand-600" {...rest} />
+    <label className={clsx('flex min-h-[44px] cursor-pointer items-center gap-3 text-sm text-stone-700 lg:min-h-[32px]', className)}>
+      <input type="checkbox" className="h-5 w-5 shrink-0 rounded border-stone-300 text-brand-600 accent-brand-600 lg:h-4 lg:w-4" {...rest} />
       <span>{label}</span>
     </label>
   );

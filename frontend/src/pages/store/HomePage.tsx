@@ -1,6 +1,6 @@
 import { SectionHeading } from '@/components/common/SectionHeading';
 import { OfferCard } from '@/components/offers/OfferCard';
-import { ProductGrid } from '@/components/product/ProductGrid';
+import { ProductGrid, ProductRail } from '@/components/product/ProductGrid';
 import { clsx } from '@/components/ui';
 import { ErrorState, Skeleton } from '@/components/ui/Feedback';
 import { Img } from '@/components/ui/Img';
@@ -12,7 +12,6 @@ import { Newsletter } from '@/sections/home/Newsletter';
 import { catalogService } from '@/services/catalogService';
 import { money } from '@/utils/format';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
 import { ArrowRight, Headphones, Quote, RefreshCw, ShieldCheck, Truck } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -20,20 +19,35 @@ import { Link } from 'react-router-dom';
 function HomeSkeleton() {
   return (
     <div className="container-page space-y-10 py-6">
-      <Skeleton className="h-[420px] w-full rounded-3xl lg:h-[500px]" />
-      <div className="grid grid-cols-3 gap-4 md:grid-cols-6">
+      <Skeleton className="h-[300px] w-full rounded-3xl sm:h-[400px] lg:h-[480px]" />
+      <div className="flex gap-3 overflow-hidden md:grid md:grid-cols-6 md:gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-square rounded-2xl" />
+          <Skeleton key={i} className="aspect-square w-[22%] shrink-0 rounded-2xl md:w-auto" />
         ))}
       </div>
-      <ProductGrid loading count={5} />
+      <ProductGrid loading count={4} />
     </div>
   );
 }
 
 export default function HomePage() {
   const { data: settings } = useSettings();
-  useSeo({ description: `${settings?.store.tagline ?? 'Online store'}. Shop fashion, electronics, home, beauty and more with fast delivery and easy returns.` });
+  useSeo({
+    description: `${settings?.store.tagline ?? 'Online store'}. Fast delivery, secure payments and easy returns.`,
+    image: settings?.store.logoUrl || null,
+    jsonLd: settings
+      ? [
+          { '@context': 'https://schema.org', '@type': 'Organization', name: settings.store.name, url: window.location.origin, ...(settings.store.logoUrl ? { logo: new URL(settings.store.logoUrl, window.location.origin).href } : {}) },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: settings.store.name,
+            url: window.location.origin,
+            potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${window.location.origin}/search?q={search_term_string}` }, 'query-input': 'required name=search_term_string' },
+          },
+        ]
+      : null,
+  });
   const { data, isLoading, error, refetch } = useQuery({ queryKey: ['home'], queryFn: () => catalogService.home() });
 
   if (isLoading) return <HomeSkeleton />;
@@ -52,17 +66,16 @@ export default function HomePage() {
       data.categories.length > 0 && (
         <section>
           <SectionHeading title={title} subtitle={subtitle} to="/products" />
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 md:grid-cols-6">
-            {data.categories.map((c, i) => (
-              <motion.div key={c.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                <Link to={`/category/${c.slug}`} className="group block text-center">
-                  <div className="aspect-square overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-stone-200/70 transition group-hover:shadow-card group-hover:ring-stone-300">
-                    <Img src={c.imageUrl} alt={c.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                  </div>
-                  <p className="mt-2.5 text-sm font-semibold text-stone-800 group-hover:text-brand-700">{c.name}</p>
-                  <p className="text-xs text-stone-500">{c.productCount} product{c.productCount === 1 ? '' : 's'}</p>
-                </Link>
-              </motion.div>
+          {/* Phones: one swipeable row. Tablet and up: a grid. */}
+          <div className="snap-row -mx-4 gap-3 px-4 md:mx-0 md:grid md:grid-cols-6 md:gap-4 md:overflow-visible md:px-0" style={{ scrollPaddingInline: '1rem' }}>
+            {data.categories.map((c) => (
+              <Link key={c.id} to={`/category/${c.slug}`} className="group block w-[22%] min-w-[76px] shrink-0 text-center md:w-auto">
+                <div className="aspect-square overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-stone-200/70 transition-shadow group-hover:shadow-card">
+                  <Img src={c.imageUrl} alt="" sizes="(min-width: 768px) 16vw, 96px" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                </div>
+                <p className="mt-2 truncate text-[13px] font-semibold text-stone-800 group-hover:text-brand-700 md:text-sm">{c.name}</p>
+                <p className="hidden text-xs text-stone-500 md:block">{c.productCount} product{c.productCount === 1 ? '' : 's'}</p>
+              </Link>
             ))}
           </div>
         </section>
@@ -71,30 +84,30 @@ export default function HomePage() {
       data.featured.length > 0 && (
         <section>
           <SectionHeading title={title} subtitle={subtitle} to="/products?featured=true" />
-          <ProductGrid products={data.featured} />
+          <ProductRail products={data.featured} />
         </section>
       ),
     trending: (title, subtitle) =>
       data.trending.length > 0 && (
         <section>
           <SectionHeading title={title} subtitle={subtitle} to="/products?trending=true" />
-          <ProductGrid products={data.trending} />
+          <ProductRail products={data.trending} />
         </section>
       ),
     bestsellers: (title, subtitle) =>
       data.bestSellers.length > 0 && (
         <section>
           <SectionHeading title={title} subtitle={subtitle} to="/products?sort=popularity" />
-          <ProductGrid products={data.bestSellers} />
+          <ProductRail products={data.bestSellers} />
         </section>
       ),
     offers: (title, subtitle) =>
       data.offers.length > 0 && (
         <section>
           <SectionHeading title={title} subtitle={subtitle} to="/offers" linkLabel="All offers" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="snap-row -mx-4 gap-3 px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:grid-cols-3" style={{ scrollPaddingInline: '1rem' }}>
             {data.offers.slice(0, 3).map((o) => (
-              <OfferCard key={o.id} offer={o} />
+              <div key={o.id} className="w-[82%] shrink-0 sm:w-auto"><OfferCard offer={o} /></div>
             ))}
           </div>
         </section>
@@ -103,9 +116,9 @@ export default function HomePage() {
       data.banners.promo.length > 0 && (
         <section className={clsx('grid gap-4', data.banners.promo.length > 1 && 'md:grid-cols-2')}>
           {data.banners.promo.map((b) => (
-            <Link key={b.id} to={b.linkUrl ?? '/offers'} className="group relative block h-52 overflow-hidden rounded-3xl bg-stone-900 sm:h-64">
-              <Img src={b.imageUrl} alt="" className="h-full w-full object-cover opacity-70 transition duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 flex flex-col justify-center bg-gradient-to-r from-stone-950/70 to-transparent p-7 sm:p-10">
+            <Link key={b.id} to={b.linkUrl ?? '/offers'} className="group relative block h-44 overflow-hidden rounded-3xl bg-stone-900 sm:h-64">
+              <Img src={b.imageUrl} alt="" preset="banner" sizes="(min-width: 768px) 50vw, 100vw" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 flex flex-col justify-center bg-gradient-to-r from-stone-950/80 via-stone-950/50 to-stone-950/20 p-6 sm:p-10">
                 <h2 className="text-2xl font-extrabold text-white sm:text-3xl">{b.title}</h2>
                 {b.subtitle && <p className="mt-1.5 text-sm text-stone-200 sm:text-base">{b.subtitle}</p>}
                 {b.ctaText && (
@@ -122,9 +135,9 @@ export default function HomePage() {
       data.testimonials.length > 0 && (
         <section>
           <SectionHeading title={title} subtitle={subtitle} />
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="snap-row -mx-4 gap-3 px-4 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0" style={{ scrollPaddingInline: '1rem' }}>
             {data.testimonials.map((t) => (
-              <figure key={t.id} className="card flex flex-col p-6">
+              <figure key={t.id} className="card flex w-[82%] shrink-0 flex-col p-5 md:w-auto md:p-6">
                 <Quote className="h-7 w-7 text-brand-200" />
                 <blockquote className="mt-3 flex-1 text-[15px] leading-7 text-stone-700">{t.text}</blockquote>
                 <figcaption className="mt-5 flex items-center justify-between border-t border-stone-100 pt-4">
@@ -143,10 +156,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="container-page space-y-12 py-4 sm:space-y-16 sm:py-6">
+    <div className="container-page space-y-9 py-3 sm:space-y-16 sm:py-6">
       <Hero banners={data.banners.hero} />
 
-      <section className="grid grid-cols-2 gap-x-4 gap-y-5 rounded-2xl border border-stone-200/80 bg-white p-5 lg:grid-cols-4 lg:p-6" aria-label="Why shop with us">
+      <section className="grid grid-cols-2 gap-x-3 gap-y-4 rounded-2xl border border-stone-200/80 bg-white p-4 lg:grid-cols-4 lg:p-6" aria-label="Why shop with us">
         {perks.map(({ icon: Icon, title, text }) => (
           <div key={title} className="flex items-center gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
@@ -154,7 +167,7 @@ export default function HomePage() {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-stone-900">{title}</p>
-              <p className="truncate text-xs text-stone-500">{text}</p>
+              <p className="line-clamp-2 text-xs leading-4 text-stone-500">{text}</p>
             </div>
           </div>
         ))}

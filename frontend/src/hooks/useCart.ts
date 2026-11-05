@@ -73,7 +73,22 @@ export function useCart(pincode?: string | null) {
       if (issue) throw new ApiError(quote.items[0]?.issueMessage ?? 'Not enough stock', 409);
       guest.setItems(guest.items.map((i) => (i.productId === line.productId && i.variantId === line.variantId ? { ...i, quantity } : i)));
     },
-    onError: (err) => toast.error(errorMessage(err)),
+    // Optimistic: the new quantity shows at once; the server's priced cart replaces it a moment
+    // later, and a failure puts the old cart back.
+    onMutate: ({ line, quantity }) => {
+      const previous = qc.getQueryData<Cart>(key);
+      if (previous) {
+        qc.setQueryData<Cart>(key, {
+          ...previous,
+          items: previous.items.map((l) => (l.id === line.id ? { ...l, quantity, lineTotal: l.unitPrice * quantity } : l)),
+        });
+      }
+      return { previous };
+    },
+    onError: (err, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(key, ctx.previous);
+      toast.error(errorMessage(err));
+    },
   });
 
   const remove = useMutation({

@@ -95,7 +95,7 @@ export function ProfilePage() {
             <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-brand-100 font-display text-3xl font-bold text-brand-800">
               {user.avatarUrl ? <img src={user.avatarUrl} alt="Profile" className="h-full w-full object-cover" /> : user.name.charAt(0).toUpperCase()}
             </div>
-            <button onClick={() => fileInput.current?.click()} aria-label="Change profile photo" className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-ink text-white transition hover:bg-stone-700">
+            <button onClick={() => fileInput.current?.click()} aria-label="Change profile photo" className="absolute -bottom-2 -right-2 flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-ink text-white transition hover:bg-stone-700">
               {uploading ? <Spinner className="h-4 w-4 text-white" /> : <Camera className="h-4 w-4" />}
             </button>
             <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => void uploadAvatar(e.target.files?.[0])} />

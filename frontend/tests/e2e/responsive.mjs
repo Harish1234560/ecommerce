@@ -5,7 +5,7 @@
 //        E2E_SCREENSHOTS=1                  saves a full-page screenshot of every page at 360px and 768px
 import { ADMIN, API, BASE, CUSTOMER, OUT, launchBrowser } from './browser.mjs';
 
-const DEFAULT_WIDTHS = [360, 375, 390, 412, 768, 1024, 1280, 1440, 1920];
+const DEFAULT_WIDTHS = [360, 375, 390, 412, 430, 768, 1024, 1280, 1440, 1920];
 const widths = process.argv.slice(2).map(Number).filter(Boolean);
 const roles = (process.env.E2E_ROLES ?? 'guest,customer,admin').split(',');
 const PARALLEL = 3;

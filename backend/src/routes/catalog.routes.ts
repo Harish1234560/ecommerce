@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/products', catalog.listProducts);
 router.get('/products/suggest', catalog.suggestProducts);
+router.get('/search/popular', catalog.popularSearches);
 router.get('/products/:slug', catalog.getProduct);
 router.get('/products/:slug/reviews', catalog.listProductReviews);
 

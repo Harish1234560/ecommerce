@@ -9,7 +9,7 @@ export function Price({ price, mrp, size = 'md', className }: { price: number; m
       <span className={clsx('font-bold text-stone-900', main)}>{money(price)}</span>
       {off > 0 && (
         <>
-          <span className={clsx('text-stone-400 line-through', size === 'xl' ? 'text-base' : 'text-xs')}>
+          <span className={clsx('text-stone-500 line-through', size === 'xl' ? 'text-base' : 'text-xs')}>
             <span className="sr-only">Original price </span>
             {money(mrp!)}
           </span>

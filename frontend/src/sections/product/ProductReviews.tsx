@@ -39,7 +39,7 @@ export function ProductReviews({ product }: { product: ProductDetail }) {
               const count = product.ratingBreakdown[r] ?? 0;
               const pct = total ? (count / total) * 100 : 0;
               return (
-                <button key={r} onClick={() => { setRating(rating === r ? null : r); setPage(1); }} aria-pressed={rating === r} className={clsx('flex w-full items-center gap-2 rounded-md px-1 py-0.5 text-xs transition-colors hover:bg-stone-100', rating === r && 'bg-stone-100')}>
+                <button key={r} onClick={() => { setRating(rating === r ? null : r); setPage(1); }} aria-pressed={rating === r} className={clsx('flex min-h-[36px] w-full items-center gap-2 rounded-md px-1 py-0.5 text-xs transition-colors hover:bg-stone-100 sm:min-h-[28px]', rating === r && 'bg-stone-100')}>
                   <span className="w-6 text-stone-600">{r}★</span>
                   <span className="h-2 flex-1 overflow-hidden rounded-full bg-stone-200">
                     <span className="block h-full rounded-full bg-amber-400" style={{ width: `${pct}%` }} />

@@ -109,7 +109,12 @@ Migrations are forward-only. Back up the database before applying them.
 
 ## Search engines
 
-The storefront is a client-rendered single-page app. The server provides `/sitemap.xml` and
-`/robots.txt`; page titles, descriptions, canonical URLs, Open Graph tags and product structured
-data are set in the browser. Google renders JavaScript and will read them; crawlers that do not run
-JavaScript will not. Add prerendering if that matters for your traffic.
+The server provides `/sitemap.xml` and `/robots.txt` and fills in each page's title, description,
+canonical URL, Open Graph tags and structured data before sending the HTML, so crawlers and link
+previews do not need JavaScript for metadata. `CLIENT_URL` must be the public URL: canonical links
+and the sitemap are built from it. The page body is rendered in the browser.
+
+## Caching with more than one instance
+
+The public-data cache is per process and clears itself within a minute, so after an admin change
+other instances may serve the previous home page or categories for up to 60 seconds.

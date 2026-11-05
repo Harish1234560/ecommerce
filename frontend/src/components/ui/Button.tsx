@@ -16,9 +16,9 @@ const VARIANT: Record<Variant, string> = {
 };
 
 const SIZE: Record<Size, string> = {
-  sm: 'h-9 px-3 text-sm gap-1.5 rounded-lg',
+  sm: 'h-10 px-3.5 text-sm gap-1.5 rounded-xl sm:h-9 sm:rounded-lg',
   md: 'h-11 px-4 text-sm gap-2 rounded-xl',
-  lg: 'h-12 px-6 text-base gap-2 rounded-xl',
+  lg: 'h-12 px-6 text-[15px] gap-2 rounded-xl',
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -31,7 +31,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function buttonClass(variant: Variant = 'primary', size: Size = 'md', block = false) {
   return clsx(
-    'inline-flex select-none items-center justify-center whitespace-nowrap font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+    'pressable inline-flex select-none items-center justify-center whitespace-nowrap font-semibold transition-[color,background-color,border-color,transform] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100',
     VARIANT[variant],
     SIZE[size],
     block && 'w-full',
@@ -53,7 +53,7 @@ export function IconButton({ label, className, children, ...rest }: ButtonHTMLAt
       type="button"
       aria-label={label}
       title={label}
-      className={clsx('inline-flex h-10 w-10 items-center justify-center rounded-full text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:opacity-50', className)}
+      className={clsx('pressable inline-flex h-11 w-11 items-center justify-center rounded-full text-stone-600 transition-[color,background-color,transform] hover:bg-stone-100 hover:text-stone-900 disabled:opacity-50', className)}
       {...rest}
     >
       {children}

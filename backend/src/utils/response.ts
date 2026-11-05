@@ -17,3 +17,9 @@ export const created = <T>(res: Response, data: T, message = 'Created') => ok(re
 export function pageMeta(total: number, page: number, limit: number) {
   return { total, page, limit, pages: Math.max(1, Math.ceil(total / limit)) };
 }
+
+// Lets browsers (and any CDN) reuse a public, non-personal response for a short time, and serve a
+// slightly stale copy while revalidating. Every other API response is `no-store` (see app.ts).
+export function publicCache(res: Response, maxAgeSeconds: number) {
+  res.setHeader('Cache-Control', `public, max-age=${maxAgeSeconds}, stale-while-revalidate=${maxAgeSeconds * 4}`);
+}

@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 export function Logo({ light }: { light?: boolean }) {
   const { data } = useSettings();
   return (
-    <Link to="/" className="flex shrink-0 items-center gap-2" aria-label={`${data?.store.name ?? 'ShopHub'} home`}>
+    <Link to="/" className="flex min-h-[44px] shrink-0 items-center gap-2" aria-label={`${data?.store.name ?? 'ShopHub'} home`}>
       {data?.store.logoUrl ? (
         <img src={data.store.logoUrl} alt="" className="h-9 w-auto max-w-[140px] object-contain" />
       ) : (
-        <span className={clsx('flex h-9 w-9 items-center justify-center rounded-xl', light ? 'bg-white text-ink' : 'bg-ink text-white')}>
+        <span className={clsx('flex h-9 w-9 items-center justify-center rounded-xl', light ? 'bg-white text-brand-700' : 'bg-brand-600 text-white')}>
           <ShoppingBag className="h-5 w-5" />
         </span>
       )}

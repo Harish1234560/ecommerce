@@ -23,7 +23,7 @@ export function Filters({ params, set, facets, categories, lockedCategory }: { p
     setMax(params.get('maxPrice') ?? '');
   }, [params]);
   const brands = (params.get('brand') ?? '').split(',').filter(Boolean);
-  const radio = 'flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm transition-colors';
+  const radio = 'flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm transition-colors lg:min-h-[36px]';
   const applyPrice = (e: FormEvent) => {
     e.preventDefault();
     set({ minPrice: min || null, maxPrice: max || null });
@@ -75,7 +75,7 @@ export function Filters({ params, set, facets, categories, lockedCategory }: { p
           {[10, 20, 30, 50].map((d) => {
             const active = params.get('discount') === String(d);
             return (
-              <button key={d} onClick={() => set({ discount: active ? null : String(d) })} aria-pressed={active} className={clsx('rounded-full border px-3 py-1 text-xs font-semibold transition-colors', active ? 'border-brand-600 bg-brand-600 text-white' : 'border-stone-300 text-stone-700 hover:border-stone-400')}>
+              <button key={d} onClick={() => set({ discount: active ? null : String(d) })} aria-pressed={active} className={clsx('min-h-[36px] rounded-full border px-3 py-1 text-xs font-semibold transition-colors', active ? 'border-brand-600 bg-brand-600 text-white' : 'border-stone-300 text-stone-700 hover:border-stone-400')}>
                 {d}% or more
               </button>
             );
@@ -89,7 +89,7 @@ export function Filters({ params, set, facets, categories, lockedCategory }: { p
 
       {facets && facets.brands.length > 0 && (
         <FilterGroup title="Brand">
-          <div className="max-h-56 space-y-2.5 overflow-y-auto pr-1">
+          <div className="max-h-56 overflow-y-auto pr-1">
             {facets.brands.map((b) => (
               <Checkbox
                 key={b.name}

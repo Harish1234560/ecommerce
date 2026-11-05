@@ -27,7 +27,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
           {scope.length > 0 && <li className="truncate">On: {scope.join(', ')}</li>}
           {offer.expiresAt && <li>Valid till {formatDate(offer.expiresAt)}</li>}
         </ul>
-        <button onClick={copy} className="mt-3 inline-flex items-center gap-2 rounded-lg border border-dashed border-brand-600 bg-brand-50 px-3 py-1.5 text-sm font-bold tracking-wide text-brand-800 transition hover:bg-brand-100" aria-label={`Copy coupon code ${offer.code}`}>
+        <button onClick={copy} className="pressable mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-dashed border-brand-600 bg-brand-50 px-3 py-1.5 text-sm font-bold tracking-wide text-brand-800 transition hover:bg-brand-100" aria-label={`Copy coupon code ${offer.code}`}>
           {offer.code} <Copy className="h-3.5 w-3.5" />
         </button>
       </div>
