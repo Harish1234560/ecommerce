@@ -5,6 +5,13 @@
 const PEXELS = 'images.pexels.com';
 const CLOUDINARY = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/;
 
+const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
+
+export function resolveAssetUrl(src: string): string {
+  if (API_ORIGIN && src.startsWith('/uploads/')) return `${API_ORIGIN}${src}`;
+  return src;
+}
+
 function resize(src: string, width: number): string | null {
   if (src.includes(PEXELS)) {
     try {
@@ -34,6 +41,7 @@ export const IMAGE_WIDTHS = {
 export type ImagePreset = keyof typeof IMAGE_WIDTHS;
 
 export function responsiveImage(src: string, preset: ImagePreset): { src: string; srcSet?: string } {
+  src = resolveAssetUrl(src);
   const widths = IMAGE_WIDTHS[preset];
   const variants = widths.map((w) => ({ w, url: resize(src, w) }));
   if (variants.some((v) => !v.url)) return { src };

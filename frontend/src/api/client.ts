@@ -1,7 +1,10 @@
 // HTTP client for the REST API: bearer token, silent session refresh, and one error type.
 // Components never use this directly — they call the functions in src/services.
 
-const API_BASE = '/api/v1';
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim();
+export const API_BASE = configuredApiBase
+  ? `${configuredApiBase.replace(/\/$/, '')}/api/v1`
+  : '/api/v1';
 
 export class ApiError extends Error {
   constructor(
@@ -73,7 +76,7 @@ function buildUrl(path: string, params?: Params) {
 async function refreshSession(): Promise<boolean> {
   refreshing ??= (async () => {
     try {
-      const res = await fetch(`${API_BASE}/auth/refresh`, { method: 'POST', credentials: 'same-origin' });
+      const       res = await fetch(`${API_BASE}/auth/refresh`, { method: 'POST', credentials: 'include' });
       if (!res.ok) return false;
       const json = (await res.json()) as SuccessBody<{ accessToken: string }>;
       accessToken = json.data.accessToken;
@@ -106,7 +109,7 @@ async function send(method: string, path: string, opts: RequestOptions, retried 
     res = await fetch(buildUrl(path, opts.params), {
       method,
       headers,
-      credentials: 'same-origin',
+      credentials: 'include',
       body: opts.form ?? (opts.body !== undefined ? JSON.stringify(opts.body) : undefined),
       signal: opts.signal,
     });

@@ -8,8 +8,14 @@ import { ok } from '../utils/response.js';
 import { changePasswordSchema, forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema, updateProfileSchema } from '../validators/auth.validators.js';
 import { validate } from '../validators/common.js';
 
-// The refresh cookie is httpOnly, SameSite=Strict and scoped to the auth routes only.
-const cookieOptions = { httpOnly: true, secure: isProd, sameSite: 'strict' as const, path: `${API_PREFIX}/auth` };
+// Production storefronts are commonly hosted on a different site, so cross-origin refresh
+// requests require Secure cookies with SameSite=None.
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? ('none' as const) : ('strict' as const),
+  path: `${API_PREFIX}/auth`,
+};
 const refreshTokenOf = (req: Request) => req.cookies?.[REFRESH_COOKIE] as string | undefined;
 const contextOf = (req: Request): authService.SessionContext => ({ userAgent: req.headers['user-agent'], ip: req.ip });
 
