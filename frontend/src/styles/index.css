@@ -1,0 +1,121 @@
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-canvas font-sans text-fg antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+  /* Visible keyboard focus everywhere, without a ring on mouse clicks or taps. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+  }
+  /* Taps should never trigger the 300ms double-tap zoom delay on controls. */
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label,
+  summary {
+    touch-action: manipulation;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+  /* 16px inputs on phones: smaller text makes iOS zoom the page when a field is focused. */
+  @media (max-width: 639px) {
+    input:not([type='checkbox']):not([type='radio']),
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .card {
+    @apply rounded-2xl border border-line/80 bg-surface;
+  }
+  .field {
+    @apply block min-h-[44px] w-full rounded-xl border border-stone-300 bg-surface px-3.5 py-2.5 text-sm text-fg placeholder:text-stone-400 transition
+      focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500;
+  }
+  .field-error {
+    @apply border-rose-400 focus:border-rose-500 focus:ring-rose-500/20;
+  }
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-stone-200/70;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-hover active:bg-stone-950;
+  }
+  /* Small press feedback on buttons (transform only — cheap to animate). */
+  .pressable {
+    @apply transition-transform duration-fast ease-out active:scale-[0.97];
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  /* Horizontal swipe rows (product rails, galleries) that snap card by card. */
+  .snap-row {
+    @apply scrollbar-none flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .snap-row > * {
+    @apply snap-start;
+  }
+}
+
+/* Admin area uses its own neutral + indigo palette. */
+.admin {
+  @apply bg-slate-100 text-slate-900;
+}
+.admin :focus-visible {
+  @apply ring-indigo-500;
+}
+.admin .btn-primary {
+  @apply bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800;
+}
+.admin .field {
+  @apply rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
